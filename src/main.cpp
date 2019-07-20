@@ -15,6 +15,8 @@
 #define CONFIG_FILE  "/config.json"
 
 struct configStruct {
+  char coord_lat[15] = "";
+  char coord_long[15] = "";
   char wifi_ssid[32] = "";
   char wifi_password[64] = "";
   char access_point_prefix[25] = "AQM-";
