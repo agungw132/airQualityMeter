@@ -48,7 +48,7 @@ bool proceed_and_save_configuration = false;
 #define HTTP_PORT 80
 ESP8266WebServer server(HTTP_PORT);
 
-#define PMS5003ST_SIZE 40
+#define PMS5003ST_SIZE 32
 #define PMS5003ST_SIG1 0X42
 #define PMS5003ST_SIG2 0X4d
 
@@ -56,7 +56,6 @@ struct pms5003STdata {
   uint16_t pm10_standard, pm25_standard, pm100_standard;
   uint16_t pm10_env, pm25_env, pm100_env;
   uint16_t particles_03um, particles_05um, particles_10um, particles_25um, particles_50um, particles_100um;
-  uint16_t hcho, temperature, humidity;
   uint16_t reserved;
   uint16_t unused;
   uint16_t checksum;
@@ -285,7 +284,9 @@ void publishDatas(JsonObject& datas) {
 }
 
 boolean readPMSdata(Stream *s) {
+  Serial.println("start reading ...");
   if (! s->available()) {
+    Serial.println("Data is unavailable");
     return false;
   }
   
@@ -359,11 +360,11 @@ boolean readPMSdata(Stream *s) {
   // put it into a nice struct :)
   memcpy((void *)&data, (void *)buffer_u16, (PMS5003ST_SIZE-2));
 
-  if (sum != data.checksum) {
-    Serial.println("Checksum failure");
-    Serial.println("Sum: "+ String(sum) + " - check: "+ String(data.checksum));
-    return false;
-  }
+//  if (sum != data.checksum) {
+//    Serial.println("Checksum failure");
+//    Serial.println("Sum: "+ String(sum) + " - check: "+ String(data.checksum));
+//    return false;
+//  }
   
   
   StaticJsonBuffer<512> json_buffer;
@@ -384,10 +385,6 @@ boolean readPMSdata(Stream *s) {
   json_data["pt50"] = data.particles_50um;
   json_data["pt100"] = data.particles_100um;
     
-  json_data["hcho"] = float(data.hcho / 1000.0);
-  json_data["tem"] = float(data.temperature / 10.0);
-  json_data["hum"] = float(data.humidity / 10.0);
-
   publishDatas(json_data);
 
   return true;
@@ -455,7 +452,8 @@ void loop() {
     mqtt_client.loop();
   
     
-    if (readPMSdata(&pms_serial)) {
+    //if (readPMSdata(&pms_serial)) {
+    readPMSdata(&pms_serial);  
     // reading data was successful!
     Serial.println();
     Serial.println("---------------------------------------");
@@ -476,16 +474,12 @@ void loop() {
     Serial.print("Particles > 5.0um / 0.1L air:"); Serial.println(data.particles_50um);
     Serial.print("Particles > 10.0 um / 0.1L air:"); Serial.println(data.particles_100um);
     Serial.println("---------------------------------------");
-    Serial.print("HCHO: "); Serial.println(float(data.hcho/1000.0), 4);
-    Serial.print("Temperature: "); Serial.println(float(data.temperature/10.), 2);
-    Serial.print("Humidity: "); Serial.println(float(data.humidity/10.0), 2);
-    Serial.println("---------------------------------------");
-  }
+  //}
     //readPMS();
     
     
     
-    delay(5000);
+    delay(10000);
     
     
 }
