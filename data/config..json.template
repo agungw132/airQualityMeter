@@ -1,0 +1,15 @@
+{
+  "coord_lat": "",
+  "coord_long": "",
+  "wifi_ssid": "",
+  "wifi_password": "",
+  "access_point_prefix": "",
+  "access_point_password": "",
+  "mqtt_server": "",
+  "mqtt_port": "",
+  "mqtt_username": "",
+  "mqtt_password": "",
+  "mqtt_topic": "",
+  "ota_password": "",
+  "ota_port": ""
+}
