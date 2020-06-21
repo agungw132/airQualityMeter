@@ -384,8 +384,9 @@ boolean readPMSdata(Stream *s) {
   json_data["pt25"] = data.particles_25um;
   json_data["pt50"] = data.particles_50um;
   json_data["pt100"] = data.particles_100um;
-    
-  publishDatas(json_data);
+  if ((data.pm10_standard < 10000) && (data.pm25_standard < 10000) && (data.pm100_standard < 10000)) {
+    publishDatas(json_data);
+  }   
 
   return true;
 }
